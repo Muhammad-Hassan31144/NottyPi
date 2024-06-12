@@ -3,9 +3,11 @@ import ReactModal from "react-modal";
 import { IoIosAddCircle } from "react-icons/io";
 import Note from "../../components/Cards/Note";
 import ModifyNotes from "./ModifyNotes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NotesPagination from "./NotesPagination";
 import Navbar from "../../components/Navbar/Navbar";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../utils/axiosInstance";
 const noteData = [
   {
     title: "Note 1",
@@ -109,7 +111,8 @@ const Home = () => {
   const [error, setError] = useState("");
   // const [theme, setTheme] = useState("light");
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [userInfo, setUserInfo] = useState({});
+  const navigate = useNavigate();
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -117,10 +120,25 @@ const Home = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
+  const getUserInfo = async () => {
+    try {
+      const resp = await axiosInstance.get("/get-user");
+      if (resp.data && resp.data.user) {
+        setUserInfo(resp.data.user);
+      }
+    } catch (error) {
+      if (error.response.status === 404) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    }
+  }
+  useEffect(() => {
+    getUserInfo();
+  }, []);
   return (
     <>
-    <Navbar />
+    <Navbar userInfo={userInfo}/>
       <aside className="flex justify-end pr-10 py-6 px-6">
         <a
           role="button"

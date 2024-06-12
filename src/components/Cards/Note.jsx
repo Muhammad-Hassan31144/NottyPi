@@ -51,7 +51,7 @@ const Note = ({ noteData }) => {
   };
   return (
     <>
-      <section className="flex items-center flex-wrap">
+      <section className="flex items-center flex-wrap ">
         <div className="card border border-gray-900 w-96 bg-base-100 shadow-xl">
           <div className="card-body">
             <h2 className="card-title">{title}</h2>

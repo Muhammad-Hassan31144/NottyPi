@@ -1,13 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import { useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import axiosInstance from "../../utils/axiosInstance";
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
   const handleSignup = async (e) => {
     e.preventDefault();
     if (!name) {
@@ -24,11 +26,39 @@ const SignUp = () => {
       return;
     }
     setError("");
+    try {
+      const resp = await axiosInstance.post("/create-account", {
+        fullName: name,
+        email: email,
+        password: password,
+      });
+      if (resp.data && resp.data.error) {
+        setError(resp.data.message);
+        return
+      }
+      if (resp.data && resp.data.accessToken) {
+        localStorage.setItem("token", resp.data.accessToken);
+        navigate("/");
+        
+      }
+    } catch (error) { 
+       if (error.response && error.response.data && error.response.data.message) {
+         setError(error.response.data.message)
+        
+       } 
+       else {
+         setError("Something went wrong! Please try again later")
+       }
+    }
   };
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  }
+
   return (
     <>
-    <Navbar />
-      <section className="flex items-center justify-between mt-28">
+    
+      <section className="flex justify-center items-center min-h-screen">
         <div className="card w-96 bg-base-100 shadow-xl">
           <form onSubmit={handleSignup} className="card-body">
           <h2 className="text-2xl font-semibold text-center">Signup</h2>

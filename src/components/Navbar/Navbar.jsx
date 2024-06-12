@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
 import { FaMagnifyingGlass } from "react-icons/fa6";
-const Navbar = () => {
+import GITHUB from "../../assets/github.jpg";
+import getInitials from "../../utils/helper";
+
+const Navbar = ({userInfo}) => {
   const [theme, setTheme] = useState("light");
   const [searchString, setSearchString] = useState("");
   const navigate = useNavigate();
@@ -13,6 +16,7 @@ const Navbar = () => {
     document.documentElement.setAttribute("data-theme", newTheme);
   };
   const handleLogout = () => {
+    localStorage.clear();
     navigate("/login");
   };
 
@@ -53,12 +57,9 @@ const Navbar = () => {
             role="button"
             className="btn btn-ghost btn-circle avatar p-0 rounded-full"
           >
-            <div className="w-10 rounded-full flex items-center justify-center">
-              <img
-                alt="Tailwind CSS Navbar component"
-                src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
-                className="rounded-full w-16 h-16 object-cover"
-              />
+            <div className="w-10 h-10 text-2xl font-medium rounded-full flex items-center justify-center">
+              {getInitials("Sucker Punch")}
+              {/* {getInitials(userInfo.fullName)} */}
             </div>
           </div>
           <ul
@@ -67,7 +68,7 @@ const Navbar = () => {
           >
             <li>
               <a className="justify-between">
-                Profile
+                {userInfo.name ? userInfo.name : "User"}
                 <span className="badge">New</span>
               </a>
             </li>
