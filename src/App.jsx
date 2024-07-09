@@ -1,39 +1,52 @@
-import SignUp from "./pages/SignUp/SignUp"
-import Home from "./pages/Home/Home"
-import Login from "./pages/Login/Login"
-import { PiPushPinBold, PiPushPinSlashBold } from "react-icons/pi";
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import SignUp from './pages/SignUp/SignUp';
+import Home from './pages/Home/Home';
+import Login from './pages/Login/Login';
+import Dashboard from './components/Dashboard';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUser } from './slices/userSlice';
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import { useEffect, useState } from "react"
+const ProtectedRoute = ({ children }) => {
+  const { token, loading } = useSelector((state) => state.user);
+  console.log(token);
+
+
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
+};
 
 const App = () => {
-  const [theme, setTheme] = useState("light");
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.user.token);
 
-  const handleThemeToggle = () => {
-    const newTheme = theme === "light" ? "synthwave" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.setAttribute("data-theme", newTheme);
-  };
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setTheme(savedTheme);
-    document.documentElement.setAttribute("data-theme", savedTheme);
-  }, []);
+    if (token) {
+      dispatch(fetchUser(token));
+    }
+  }, [dispatch, token]);
+
   return (
     <div>
       <Router>
         <Routes>
-          <Route path="/" exact element={<Home />} />
-          <Route path="/signup" exact element={<SignUp />} />
-          <Route path="/login" exact element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="*"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </div>
-  )
-}
+  );
+};
 
-
-
-
-export default App
+export default App;
